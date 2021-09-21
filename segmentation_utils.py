@@ -1,22 +1,16 @@
-import torchvision.transforms as transforms
 import cv2
 import numpy as np
-import numpy
 import torch
 from label_color_map import label_color_map as label_map
 
 
 def get_segment_labels(image, model, device):
-    # print('输入Dimension：', image.shape)
     outputs = model(image)
-    # uncomment the following lines for more info
-    # print(type(outputs))
-    # print(outputs['out'].shape)
-    # print(outputs)
     return outputs
 
 
 def calculate_IoU(output, mask):
+    # calculate the IoU for an image
     labels = torch.argmax(output.squeeze(), dim=0).detach().cpu().numpy()
     mask = mask.squeeze().cpu().numpy()
     n_inter = 0
@@ -32,6 +26,7 @@ def calculate_IoU(output, mask):
 
 
 def draw_segmentation_map(outputs):
+    # create the RGB version of labels for model outputs
     labels = torch.argmax(outputs.squeeze(), dim=0).detach().cpu().numpy()
     red_map = np.zeros_like(labels).astype(np.uint8)
     green_map = np.zeros_like(labels).astype(np.uint8)
@@ -48,6 +43,7 @@ def draw_segmentation_map(outputs):
 
 
 def draw_RGB_labels(labels):
+    # create the RGB version of labels for grayscale labels
     labels = np.array(labels)
     red_map = np.zeros_like(labels).astype(np.uint8)
     green_map = np.zeros_like(labels).astype(np.uint8)
@@ -64,6 +60,7 @@ def draw_RGB_labels(labels):
 
 
 def image_overlay(image, segmented_image):
+    # overlay the images with predicted labels
     alpha = 0.6  # how much transparency to apply
     beta = 1 - alpha  # alpha + beta should equal 1
     gamma = 0  # scalar added to each sum
